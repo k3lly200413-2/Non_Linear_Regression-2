@@ -5,6 +5,7 @@ from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
+import time
 
 POWER_DATA_URL = "https://github.com/datascienceunibo/dialab2024/raw/main/Regressione_non_Lineare/power.csv"
 HOUSING_DATA_URL = "https://github.com/datascienceunibo/dialab2024/raw/main/Regressione_non_Lineare/housing.csv"
@@ -58,6 +59,13 @@ def plot_model_on_data(X, y, model=None):
         plt.xlim(xlim); plt.ylim(ylim)
     plt.grid()
     plt.xlabel("Temperatura (°C)"); plt.ylabel("Consumi (GW)")
+    
+def poly_std_elasticnet(degree):
+    return Pipeline([
+        ("poly", PolynomialFeatures(degree=degree, include_bias=False)),
+        ("std",  StandardScaler()),
+        ("regr", ElasticNet(alpha=0.5, l1_ratio=0.2))
+    ])
 
 def main():
     global X_train, y_train
@@ -143,8 +151,39 @@ def main():
         ("scale", StandardScaler()),
         ("regr",  elastic_net_with_alphas(1, 0.1))
     ])
+    
+    # la lista delle feature da considerare è:
+    Xsub_feats = ["CHAS", "RM", "PTRATIO", "B", "LSTAT"]
+    # creo una selezione sia dal training che dal validation set
+    Xsub_train = X_train[Xsub_feats]
+    Xsub_test = X_test[Xsub_feats]
+    # stampo il numero di colonne
+    Xsub_train.shape[1]
     model.fit(X_train, y_train)
     print_eval(X_test, y_test, model)
+    start = time.time()
+    model = poly_std_elasticnet(2)
+    model.fit(Xsub_train, y_train)
+    print_eval(Xsub_test, y_test, model)
+    print(time.time() - start)
+    
+    start = time.time()
+    model_two = poly_std_elasticnet(2)
+    model_two.fit(X_train, y_train)
+    print_eval(X_test, y_test, model_two)
+    print(time.time() - start)
+    
+    start = time.time()
+    model_three = poly_std_elasticnet(5)
+    model_three.fit(Xsub_train, y_train)
+    print_eval(Xsub_train, y_train, model_three)
+    print(time.time() - start)
+    
+    start = time.time()
+    model_four = poly_std_elasticnet(5)
+    model_four.fit(X_train, y_train)
+    print_eval(X_test, y_test, model_four)
+    print(time.time() - start)
     
     plt.show()
 
