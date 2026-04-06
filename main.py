@@ -20,6 +20,11 @@ y_train = power.loc[is_train, "demand"]
 X_test = power.loc[~is_train, ["temp"]]
 y_test = power.loc[~is_train, "demand"]
 
+def elastic_net_with_alphas(alpha_l2, alpha_l1):
+    alpha = alpha_l1 + alpha_l2
+    l1_ratio = alpha_l1 / alpha
+    return ElasticNet(alpha=alpha, l1_ratio=l1_ratio)
+
 def test_regression(degree, alpha):
     global X_train, y_train
     prm = Pipeline([
@@ -133,6 +138,13 @@ def main():
     
     model.fit(X_train, y_train)
     print_eval(X_train, y_train, model)
+    
+    model = Pipeline([
+        ("scale", StandardScaler()),
+        ("regr",  elastic_net_with_alphas(1, 0.1))
+    ])
+    model.fit(X_train, y_train)
+    print_eval(X_test, y_test, model)
     
     plt.show()
 
