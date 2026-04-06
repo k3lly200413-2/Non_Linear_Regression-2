@@ -1,7 +1,7 @@
 import numpy as np, pandas as pd, matplotlib.pyplot as plt, os
 from urllib.request import urlretrieve
 from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error, r2_score
-from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
@@ -99,24 +99,33 @@ def main():
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1/3, random_state=42)
     
-    model_a = LinearRegression()
-    model_b = Ridge(alpha=10)
-    model_c = Pipeline([
-        ("stand",   StandardScaler()),
-        ("linreg",  LinearRegression())
-    ])
-    model_c.fit(X_train, y_train)
-    print_eval(X_train, y_train, model_c)
-    model_b.fit(X_train, y_train)
-    print_eval(X_train, y_train, model_b)
-    model_a.fit(X_train, y_train)
-    print_eval(X_train, y_train, model_a)
+    # model_a = LinearRegression()
+    # model_b = Ridge(alpha=10)
+    # model_c = Pipeline([
+    #     ("stand",   StandardScaler()),
+    #     ("linreg",  LinearRegression())
+    # ])
+    # model_c.fit(X_train, y_train)
+    # print_eval(X_train, y_train, model_c)
+    # model_b.fit(X_train, y_train)
+    # print_eval(X_train, y_train, model_b)
+    # model_a.fit(X_train, y_train)
+    # print_eval(X_train, y_train, model_a)
     
-    print(pd.DataFrame({
-        "linear": model_a.coef_,
-        "ridge": model_b.coef_,
-        "scaled": model_c.named_steps["linreg"].coef_
-    }, index=X.columns))
+    # print(pd.DataFrame({
+    #     "linear": model_a.coef_,
+    #     "ridge": model_b.coef_,
+    #     "scaled": model_c.named_steps["linreg"].coef_
+    # }, index=X.columns))
+    
+    model = Pipeline([
+        ("scale", StandardScaler()),
+        ("regr", Lasso(alpha=1))
+    ])
+    model.fit(X_train, y_train)
+    
+    print_eval(X_test, y_test, model)
+    
     plt.show()
 
 if __name__ == "__main__":
