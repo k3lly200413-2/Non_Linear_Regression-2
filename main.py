@@ -1,7 +1,7 @@
 import numpy as np, pandas as pd, matplotlib.pyplot as plt, os
 from urllib.request import urlretrieve
 from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error, r2_score
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
@@ -118,13 +118,21 @@ def main():
     #     "scaled": model_c.named_steps["linreg"].coef_
     # }, index=X.columns))
     
-    model = Pipeline([
-        ("scale", StandardScaler()),
-        ("regr", Lasso(alpha=0.2))
-    ])
-    model.fit(X_train, y_train)
+    # model = Pipeline([
+    #     ("scale", StandardScaler()),
+    #     ("regr", Lasso(alpha=0.2))
+    # ])
+    # model.fit(X_train, y_train)
     
-    print_eval(X_test, y_test, model)
+    # print_eval(X_test, y_test, model)
+    
+    model = Pipeline([
+        ("scale",   StandardScaler()),
+        ("reg",     ElasticNet(alpha=0.2, l1_ratio=0.1))
+    ])
+    
+    model.fit(X_train, y_train)
+    print_eval(X_train, y_train, model)
     
     plt.show()
 
