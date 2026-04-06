@@ -46,18 +46,19 @@ def main():
     
     lrm = LinearRegression()
     prm = Pipeline([
-        ("poly", PolynomialFeatures(degree=3, include_bias=False)),
-        ("scale", StandardScaler()), 
-        ("linreg", LinearRegression())
+        ("poly",    PolynomialFeatures(degree=30, include_bias=False)),
+        ("scale",   StandardScaler()), 
+        ("linreg",  LinearRegression())
     ])
     prm.fit(X_train, y_train)
     
-    print_eval(X_train, y_train, prm)
+    print_eval(X_test, y_test, prm)
     
     plot_model_on_data(X_test, y_test, prm)
     
+    
+    
     plt.show()
-
 
 if __name__ == "__main__":
     main()
