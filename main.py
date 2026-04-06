@@ -120,7 +120,7 @@ def main():
     
     model = Pipeline([
         ("scale", StandardScaler()),
-        ("regr", Lasso(alpha=1))
+        ("regr", Lasso(alpha=0.2))
     ])
     model.fit(X_train, y_train)
     
